@@ -2,13 +2,21 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"strings"
 
 	xj "github.com/basgys/goxml2json"
 )
 
 func main() {
-	xml := strings.NewReader("")
+	var fileName = "./fixtures/1000.xml"
+	xmlData, err := ioutil.ReadFile(fileName)
+
+	if err != nil {
+		fmt.Printf("Error reading XML data from file: %s, error: %s\n", fileName, err)
+	}
+
+	xml := strings.NewReader(string(xmlData))
 
 	json, err := xj.Convert(xml)
 	if err != nil {
