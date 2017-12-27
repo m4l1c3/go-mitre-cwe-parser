@@ -8,6 +8,14 @@ import (
 	xj "github.com/basgys/goxml2json"
 )
 
+type VulnerabilityWriteup struct {
+	Description string
+	Resources   string
+	URL         string
+	Title       string
+	Severity    string
+}
+
 func main() {
 	var fileName = "./fixtures/1000.xml"
 	xmlData, err := ioutil.ReadFile(fileName)
