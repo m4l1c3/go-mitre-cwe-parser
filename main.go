@@ -1,7 +1,7 @@
 package main
 
 import (
-	//"encoding/json"
+	"encoding/json"
 	"encoding/xml"
 	"fmt"
 	"io/ioutil"
@@ -49,12 +49,7 @@ type VulnerabilityWriteup struct {
 	Severity    string
 }
 
-//func CreateVulnerability() *VulnerabilityWriteup {
-
-//}
-
 func main() {
-	//vulnerabilities := make([]VulnerabilityWriteup, 0)
 	var fileName = "./fixtures/cwec_v3.0.xml"
 	xmlData, err := ioutil.ReadFile(fileName)
 
@@ -66,18 +61,29 @@ func main() {
 	error := xml.Unmarshal(xmlData, &weaknesses)
 
 	if error != nil {
-		fmt.Printf("Error marshalling: %s\n", error)
+		fmt.Printf("Error unmarshalling: %s\n", error)
 		return
 	}
 
-	fmt.Println("Weaknesses: %s\n", weaknesses.CatalogName)
+	data, jsonerror := json.Marshal(weaknesses)
 
-	for _, flaw := range weaknesses.Flaws.Findings {
-		fmt.Printf("Flaw id: %s, name: %s\n", flaw.ID, flaw.Name)
-
-		for _, mitigation := range flaw.MitigationStrategy.Mitigations {
-			fmt.Printf("Mitigations: %s\n", mitigation.Description)
-		}
+	if jsonerror != nil {
+		fmt.Printf("Error marshalling to json: %s\n", jsonerror)
+		return
+	}
+	if data != nil {
+		fmt.Printf("data: %s\n", string(data))
 	}
 
+	/*
+	 *    fmt.Println("Weaknesses: %s\n", weaknesses.CatalogName)
+	 *
+	 *    for _, flaw := range weaknesses.Flaws.Findings {
+	 *        fmt.Printf("Flaw id: %s, name: %s\n", flaw.ID, flaw.Name)
+	 *
+	 *        for _, mitigation := range flaw.MitigationStrategy.Mitigations {
+	 *            fmt.Printf("Mitigations: %s\n", mitigation.Description)
+	 *        }
+	 *    }
+	 */
 }
