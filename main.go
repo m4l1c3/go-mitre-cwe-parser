@@ -37,6 +37,15 @@ type Mitigation struct {
 	Description string   `xml:"Description"`
 }
 
+type Vulnerability struct {
+	description     string
+	title           string
+	source          string
+	references      string
+	recommendations string
+	severity        string
+}
+
 func GetXML(xmlData []byte, weaknesses *WeaknessCatalog) {
 	error := xml.Unmarshal(xmlData, &weaknesses)
 
@@ -46,7 +55,7 @@ func GetXML(xmlData []byte, weaknesses *WeaknessCatalog) {
 	}
 }
 
-func GetJSON(weaknesses WeaknessCatalog) []byte {
+func GetWeaknessesJSON(weaknesses WeaknessCatalog) []byte {
 	data, error := json.Marshal(weaknesses)
 
 	if error != nil {
@@ -77,6 +86,22 @@ func WriteOutput(data []byte) bool {
 	return true
 }
 
+func AppendVulns(vulns []Vulnerability, catalog string, item *Weakness) []Vulnerability {
+	rec := ""
+	for _, item := range item.MitigationStrategy.Mitigations {
+		rec += fmt.Sprintf("%s\n", item.Description)
+	}
+	vulns = append(vulns, Vulnerability{
+		title:           fmt.Sprintf("%s-%s:%s", catalog, item.ID, item.Name),
+		description:     item.Description,
+		source:          "Other",
+		references:      fmt.Sprintf("https://cwe.mitre.org/data/definitions%s.html", item.ID),
+		severity:        "Medium",
+		recommendations: rec,
+	})
+	return vulns
+}
+
 func main() {
 	var fileName = "./fixtures/cwec_v3.0.xml"
 	xmlData, err := ioutil.ReadFile(fileName)
@@ -87,9 +112,19 @@ func main() {
 
 	weaknesses := WeaknessCatalog{}
 	GetXML(xmlData, &weaknesses)
-	data := GetJSON(weaknesses)
+	// data := GetWeaknessesJSON(weaknesses)
 
-	if data != nil {
-		WriteOutput(data)
+	catalogName := weaknesses.CatalogName
+	var vulns []Vulnerability
+
+	for _, item := range weaknesses.Flaws.Findings {
+		// fmt.Printf("Index: %d, Item: %s\n", index, item)
+		AppendVulns(vulns, catalogName, &item)
 	}
+	if len(vulns) > 0 {
+		fmt.Printf("Here")
+	}
+	// if data != nil {
+	// 	WriteOutput(data)
+	// }
 }
