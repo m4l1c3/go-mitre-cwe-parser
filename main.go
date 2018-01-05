@@ -5,6 +5,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	"io/ioutil"
+	"os"
 )
 
 type WeaknessCatalog struct {
@@ -36,17 +37,44 @@ type Mitigation struct {
 	Description string   `xml:"Description"`
 }
 
-type MitigationDescription struct {
-	XMLName      xml.Name `xml:"Description"`
-	Descriptions []string `xml:"xhtml:p,innerxml"`
+func GetXML(xmlData []byte, weaknesses *WeaknessCatalog) {
+	error := xml.Unmarshal(xmlData, &weaknesses)
+
+	if error != nil {
+		fmt.Printf("Error unmarshalling: %s\n", error)
+		return
+	}
 }
 
-type VulnerabilityWriteup struct {
-	Description string
-	Resources   string
-	URL         string
-	Title       string
-	Severity    string
+func GetJSON(weaknesses WeaknessCatalog) []byte {
+	data, error := json.Marshal(weaknesses)
+
+	if error != nil {
+		fmt.Printf("Error marshalling to json: %s\n", error)
+		return nil
+	}
+
+	return data
+}
+
+func WriteOutput(data []byte) bool {
+	outputFile, err := os.Create("./output.json")
+	if err != nil {
+		fmt.Printf("Error writing output: %s\n")
+		return false
+	}
+	defer outputFile.Close()
+
+	write, err := outputFile.WriteString(fmt.Sprintf("%s", string(data)))
+	if err != nil {
+		fmt.Printf("Error writing file %s\n", err)
+		return false
+	}
+	if write > 0 {
+		fmt.Printf("Succesfully wrote output to output.json")
+	}
+	outputFile.Sync()
+	return true
 }
 
 func main() {
@@ -58,32 +86,10 @@ func main() {
 	}
 
 	weaknesses := WeaknessCatalog{}
-	error := xml.Unmarshal(xmlData, &weaknesses)
+	GetXML(xmlData, &weaknesses)
+	data := GetJSON(weaknesses)
 
-	if error != nil {
-		fmt.Printf("Error unmarshalling: %s\n", error)
-		return
-	}
-
-	data, jsonerror := json.Marshal(weaknesses)
-
-	if jsonerror != nil {
-		fmt.Printf("Error marshalling to json: %s\n", jsonerror)
-		return
-	}
 	if data != nil {
-		fmt.Printf("data: %s\n", string(data))
+		WriteOutput(data)
 	}
-
-	/*
-	 *    fmt.Println("Weaknesses: %s\n", weaknesses.CatalogName)
-	 *
-	 *    for _, flaw := range weaknesses.Flaws.Findings {
-	 *        fmt.Printf("Flaw id: %s, name: %s\n", flaw.ID, flaw.Name)
-	 *
-	 *        for _, mitigation := range flaw.MitigationStrategy.Mitigations {
-	 *            fmt.Printf("Mitigations: %s\n", mitigation.Description)
-	 *        }
-	 *    }
-	 */
 }
