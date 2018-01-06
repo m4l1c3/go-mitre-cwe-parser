@@ -70,7 +70,7 @@ func WriteOutput(index string, data []byte) {
 //}
 
 func AppendVulns(vulns []types.Vulnerability, catalog string, weakness *types.Weakness) []types.Vulnerability {
-	if validation.VulerabilityIsValid(catalog, &weakness) {
+	if validation.VulnerabilityIsValid(catalog, weakness) {
 		rec := ""
 		for _, mitigation := range weakness.MitigationStrategy.Mitigations {
 			if validation.MitigationIsValid(&mitigation) {
