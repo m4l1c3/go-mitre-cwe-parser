@@ -8,7 +8,6 @@ import (
 	"github.com/m4l1c3/go-mitre-cwe-parser/types"
 	"github.com/m4l1c3/go-mitre-cwe-parser/validation"
 	"io/ioutil"
-	"os"
 	"strconv"
 )
 
@@ -32,45 +31,8 @@ func GetJSON(value interface{}) []byte {
 	return data
 }
 
-func WriteOutput(index string, data []byte) {
-	outputFile, err := os.Create(fmt.Sprintf("./%s-%s", index, "output.json"))
-	if err != nil {
-		fmt.Printf("Error writing output: %s\n")
-		return
-	}
-	defer outputFile.Close()
-
-	_, error := outputFile.WriteString(fmt.Sprintf("%s", string(data)))
-	if error != nil {
-		fmt.Printf("Error writing file %s\n", err)
-		return
-	}
-	outputFile.Sync()
-}
-
-//func VulnerabilityIsValid(catalog string, weakness *types.Weakness) bool {
-//    return WeaknessIsValid(weakness) && CatalogIsValid(catalog)
-//}
-
-//func WeaknessIsValid(weakness *types.Weakness) bool {
-//    return (weakness.ID != "" && weakness.Description != "" &&
-//        weakness.Name != "")
-//}
-
-//func MitigationIsValid(mitigation *types.Mitigation) bool {
-//    return mitigation != nil && mitigation.Description != ""
-//}
-
-//func CatalogIsValid(catalog string) bool {
-//    return catalog != ""
-//}
-
-//func TrimRandom(s string) string {
-//    return strings.Replace(s, "   ", "", -1)
-//}
-
 func AppendVulns(vulns []types.Vulnerability, catalog string, weakness *types.Weakness) []types.Vulnerability {
-	if validation.VulerabilityIsValid(catalog, &weakness) {
+	if validation.VulnerabilityIsValid(catalog, weakness) {
 		rec := ""
 		for _, mitigation := range weakness.MitigationStrategy.Mitigations {
 			if validation.MitigationIsValid(&mitigation) {
@@ -112,7 +74,7 @@ func main() {
 	if len(vulns) > 0 {
 		for i, v := range vulns {
 			data := GetJSON(&v)
-			WriteOutput(strconv.Itoa(i), data)
+			helpers.WriteOutput(strconv.Itoa(i), data)
 		}
 	}
 
