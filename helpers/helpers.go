@@ -3,7 +3,16 @@ package helpers
 import (
 	"fmt"
 	"os"
+	"strings"
 )
+
+func TrimRandom(s string) string {
+	return strings.Replace(s, "   ", "", -1)
+}
+
+func Trim(s string) string {
+	return TrimRandom(strings.TrimSpace(s))
+}
 
 func WriteOutput(index string, data []byte) {
 	outputFile, err := os.Create(fmt.Sprintf("./%s-%s", index, "output.json"))
