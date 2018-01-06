@@ -1,5 +1,9 @@
 package helpers
 
+import (
+	"strings"
+)
+
 func TrimRandom(s string) string {
 	return strings.Replace(s, "   ", "", -1)
 }
