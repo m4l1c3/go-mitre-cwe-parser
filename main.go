@@ -4,13 +4,15 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
+	"io/ioutil"
+	"strconv"
+
 	"github.com/m4l1c3/go-mitre-cwe-parser/helpers"
 	"github.com/m4l1c3/go-mitre-cwe-parser/types"
 	"github.com/m4l1c3/go-mitre-cwe-parser/validation"
-	"io/ioutil"
-	"strconv"
 )
 
+//GetXML is a wrapper for go's built-in unmarshalling methods, this transforms raw XML into pre-defined struct
 func GetXML(xmlData []byte, weaknesses *types.WeaknessCatalog) {
 	error := xml.Unmarshal(xmlData, &weaknesses)
 
@@ -20,6 +22,7 @@ func GetXML(xmlData []byte, weaknesses *types.WeaknessCatalog) {
 	}
 }
 
+//GetJSON is a wrapper for go's built-in marshalling method for converting structs into pre-defined structs to JSON objects
 func GetJSON(value interface{}) []byte {
 	data, error := json.Marshal(value)
 
@@ -31,6 +34,7 @@ func GetJSON(value interface{}) []byte {
 	return data
 }
 
+//AppendVulns takes a weakness and converts it into a Vulnerability object and appends it to a slice containing Vulnerabilities
 func AppendVulns(vulns []types.Vulnerability, catalog string, weakness *types.Weakness) []types.Vulnerability {
 	if validation.VulnerabilityIsValid(catalog, weakness) {
 		rec := ""
@@ -54,6 +58,7 @@ func AppendVulns(vulns []types.Vulnerability, catalog string, weakness *types.We
 
 func main() {
 	var fileName = "./fixtures/cwec_v3.0.xml"
+	var vulns []types.Vulnerability
 	xmlData, err := ioutil.ReadFile(fileName)
 
 	if err != nil {
@@ -62,22 +67,18 @@ func main() {
 
 	weaknesses := types.WeaknessCatalog{}
 	GetXML(xmlData, &weaknesses)
-	// data := GetWeaknessesJSON(weaknesses)
-
 	catalogName := weaknesses.CatalogName
-	var vulns []types.Vulnerability
 
+	//Create our array of vulnerabilities
 	for _, item := range weaknesses.Flaws.Findings {
-		// fmt.Printf("Index: %d, Item: %s\n", index, item)
 		vulns = AppendVulns(vulns, catalogName, &item)
 	}
+
 	if len(vulns) > 0 {
+		//Write each vulnerability to a JSON file
 		for i, v := range vulns {
 			data := GetJSON(&v)
 			helpers.WriteOutput(strconv.Itoa(i), data)
 		}
 	}
-
-	// 	WriteOutput(data)
-	// }
 }
