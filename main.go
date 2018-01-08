@@ -77,8 +77,7 @@ func main() {
 	if len(vulns) > 0 {
 		//Write each vulnerability to a JSON file
 		for i, v := range vulns {
-			data := GetJSON(&v)
-			helpers.WriteOutput(strconv.Itoa(i), data)
+			helpers.WriteOutput(strconv.Itoa(i), GetJSON(&v))
 		}
 	}
 }
