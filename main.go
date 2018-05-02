@@ -46,7 +46,6 @@ func AppendVulns(vulns []types.Vulnerability, catalog string, weakness *types.We
 		return append(vulns, types.Vulnerability{
 			Title:           fmt.Sprintf("%s-%s: %s", catalog, weakness.ID, weakness.Name),
 			Description:     helpers.Trim(weakness.Description),
-			Source:          "Other",
 			References:      fmt.Sprintf("https://cwe.mitre.org/data/definitions/%s.html", weakness.ID),
 			Severity:        "Medium",
 			Recommendations: rec,

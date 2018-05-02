@@ -36,7 +36,6 @@ type Mitigation struct {
 type Vulnerability struct {
 	Description     string `json:"description"`
 	Title           string `json:"title"`
-	Source          string `json:"source"`
 	References      string `json:"references"`
 	Recommendations string `json:"recommendations"`
 	Severity        string `json:"severity"`

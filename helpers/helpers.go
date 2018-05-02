@@ -22,7 +22,7 @@ func WriteOutput(index string, data []byte) {
 	}
 	defer outputFile.Close()
 
-	_, error := outputFile.WriteString(fmt.Sprintf("%s", string(data)))
+	_, error := outputFile.WriteString(fmt.Sprintf("%s", string(strings.Replace(data, "\n", "\n\n", -1))))
 	if error != nil {
 		fmt.Printf("Error writing file %s\n", err)
 		return
