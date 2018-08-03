@@ -7,9 +7,9 @@ import (
 	"io/ioutil"
 	"strconv"
 
-	"github.com/m4l1c3/go-mitre-cwe-parser/helpers"
-	"github.com/m4l1c3/go-mitre-cwe-parser/types"
-	"github.com/m4l1c3/go-mitre-cwe-parser/validation"
+	"go-mitre-cwe-parser/helpers"
+	"go-mitre-cwe-parser/types"
+	"go-mitre-cwe-parser/validation"
 )
 
 //GetXML is a wrapper for go's built-in unmarshalling methods, this transforms raw XML into pre-defined struct

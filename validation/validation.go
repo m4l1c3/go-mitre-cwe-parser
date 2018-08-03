@@ -1,7 +1,7 @@
 package validation
 
 import (
-	"github.com/m4l1c3/go-mitre-cwe-parser/types"
+	"go-mitre-cwe-parser/types"
 )
 
 func VulnerabilityIsValid(catalog string, weakness *types.Weakness) bool {
